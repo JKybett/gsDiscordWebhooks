@@ -1,5 +1,8 @@
 # Documentation
 
+### Required Permissions:
+- Connect to an external service
+
 ### Note on editing existing webhook messages:
 When I originally made this script, Google Script appeared to be unable to make Patch requests to Discord in the way that is necessary to edit webhook messages. This is something I have not yet found time to reinvestigate and correct in the code if this is no longer the case. One way around this is to have a website hosted elsewhere that can act as an intermediary. If you have access to such a page, and that page takes the patch data by means of a POST request with a payload of `{"POST_URL" : string , "payload" : Object}`, set its URL in the `patcherLink` variable at the top of the code to enable editing messages.
 
@@ -19,6 +22,11 @@ Sends a webhook to Discord. This method is used by the classes in this file whic
 ## `class Webhook`
 
 Represents a Discord Webhook message.
+
+### Properties
+| Name | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| content | string | null | The content of the message. |
 
 ### `constructor(setUsername = false, setAvatar_url = false)`
 
@@ -55,8 +63,23 @@ Send the webhook message.
 
 Represents an Embed within a Webhook message. (A webhook can have 10 embeds per message)
 
+### Properties
 All properties of this class, with the exception of fields can be set to false to be omitted from the message.
-
+| Name          | Type                | Default    | Description                                                                                            |
+| :---          | :---                | :---       | :---                                                                                                   |
+| title         | `string \| boolean` | `false`    | The text that is placed above the description, usually highlighted. Also directs to a URL, if given.   |
+| description   | `string \| boolean` | `false`    | The part of the embed where most of the text is contained.                                             |
+| url           | `string \| boolean` | `false`    | The url to hyperlink the title with.                                                                   |
+| color         | `string \| boolean` | `false`    | Color of your embed’s border, in decimal.                                                              |
+| fields        | `Field[]`           | `[]`       | Fields included in the Embed.                                                                          |
+| authorName    | `string \| boolean` | `false`    | Name of Author to appear at top of Embed.                                                              |
+| authorURL     | `string \| boolean` | `false`    | The url to hyperlink the author name with.                                                             |
+| authorIconURL | `string \| boolean` | `false`    | URL of image to appear beside author name.                                                             |
+| footerText    | `string \| boolean` | `false`    | Text at the bottom of the embed.                                                                       |
+| footerIconURL | `string \| boolean` | `false`    | URL of icon to appear beside footer.                                                                   |
+| timestamp     | `string \| boolean` | `false`    | Time that the embed was posted in the format of "YYYY-MM-DDTHH:MM:SS.MSSZ". Located next to the footer.|
+| image_url     | `string \| boolean` | `false`    | URL of a large-sized image located below the “Description” element.                                    |
+| thumb_url     | `string \| boolean` | `false`    | URL of a medium-sized image in the top right corner of the embed.                                      |
 
 ### `constructor()`
 
@@ -94,9 +117,9 @@ Represents a Field within an Embed. (An embed can contain a maximum of 25 fields
 Construct a new Field.
 
  * **Parameters:**
-   * `[setName="**` — `string` — **"] - The text that is placed at the top of the Field in bold.
-   * `[setValue="**` — `string` — **"] - The body of the Field.
-   * `[setInline=false]` — `boolean` — - Whether to put this field in the same row as other fields, rather than having its own row.
+   * `[setName="** **"]` — `string` — The text that is placed at the top of the Field in bold.
+   * `[setValue="** **"]` — `string` — The body of the Field.
+   * `[setInline="** **"]` — `string` — Whether to put this field in the same row as other fields, rather than having its own row.
 
 ### `payload()`
 
