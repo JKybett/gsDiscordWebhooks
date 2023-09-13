@@ -17,6 +17,7 @@ Sends a webhook to Discord. This method is used by the classes in this file whic
    * `[payload]` — `Object` — Discord-compatible representation of a webhook message.
    * `[messageID=false]` — `string|boolean` — The ID of an existing webhook message to edit instead of sending a new message. False to send a new message. NOTE: This requires that the patcherLink variable has been set.
    * `[thread_id=false]` — `string|boolean` — The ID of an existing thread to send the webhook message to instead of sending it to the main channel. False to send in the main channel.
+   * `[waitForFullResponse=false]` — `boolean` — Whether to wait for the full response when webhook is sent.
  * **Returns:** `HTTPResponse` — The response from the Discord Server.
 
 ## `class Webhook`
@@ -33,14 +34,15 @@ Represents a Discord Webhook message.
 Construct a new Webhook message.
 
  * **Parameters:**
-   * `[setUsername=false]` — `string|boolean` — - Username to override displayed webhook username for this message. False to use the webhook's username.
-   * `[avatar_url=false]` — `string|boolean` — - Url to avatar to override displayed webhook avatar for this message. False to use the webhook's avatar.
+   * `[setUsername=false]` — `string|boolean` — Username to override displayed webhook username for this message. False to use the webhook's username.
+   * `[avatar_url=false]` — `string|boolean` — Url to avatar to override displayed webhook avatar for this message. False to use the webhook's avatar.
+   * `[waitForFullResponse=false]` — `boolean` — Whether the Webhook should wait for the full response when sending webhooks. Required to fetch message IDs of sent messages.
 
 ### `addEmbed(newEmbed)`
 
 Adds an Embed object to the webhook.
 
- * **Parameters:** `[newEmbed]` — `Embed` — - The Embed.
+ * **Parameters:** `[newEmbed]` — `Embed` — The Embed.
  * **Returns:** `Webhook` — This Webhook object, for easy chaining.
 
 ### `payload()`
@@ -58,6 +60,12 @@ Send the webhook message.
    * `[messageID=false]` — `string|boolean` — The ID of an existing webhook message to edit instead of sending a new message. False to send a new message. NOTE: This requires that the patcherLink variable has been set.
    * `[thread_id=false]` — `string|boolean` — The ID of an existing thread to send the webhook message to instead of sending it to the main channel. False to send in the main channel.
  * **Returns:** `Webhook` — This Webhook object, for easy chaining.
+
+### `lastSentMessageID()`
+
+Gets the Message ID of the last message sent by this Webhook.
+
+ * **Returns:** `string|null` — The ID of the last message sent by this Webhook, if the Webhook was constructed with getFullResponses set to true and the Webhook has sent a message. Returns null otherwise.
 
 ## `class Embed`
 
