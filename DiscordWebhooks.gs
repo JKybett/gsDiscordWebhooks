@@ -12,11 +12,15 @@ var patcherLink = false;
  * @param {Object} [payload] Discord-compatible representation of a webhook message.
  * @param {string|boolean} [messageID=false] The ID of an existing webhook message to edit instead of sending a new message. False to send a new message. NOTE: This requires that the patcherLink variable has been set.
  * @param {string|boolean} [thread_id=false] The ID of an existing thread to send the webhook message to instead of sending it to the main channel. False to send in the main channel.
+ * @param {boolean} [waitForFullResponse=false] Whether to wait for the full response when webhook is sent.
  * @returns {HTTPResponse} The response from the Discord Server.
  */
-function sendWebhook(POST_URL, payload, messageID = false, thread_id = false){
+function sendWebhook(POST_URL, payload, messageID = false, thread_id = false, waitForFullResponse = false){
   if(messageID && patcherLink){
     POST_URL = POST_URL+"/messages/"+messageID;
+    if(waitForFullResponse){
+      POST_URL+="?wait=true";
+    }
     var options = {
       "method": "post",
       "headers": {
@@ -27,15 +31,20 @@ function sendWebhook(POST_URL, payload, messageID = false, thread_id = false){
     };
     var response = UrlFetchApp.fetch(patcherLink , options);
   } else {
-    if(thread_id){
+    if(thread_id && waitForFullResponse){
+      POST_URL = POST_URL+"?thread_id="+thread_id+"&wait=true";
+    } else if(thread_id){
       POST_URL = POST_URL+"?thread_id="+thread_id;
+    } else if(waitForFullResponse) {
+      POST_URL = POST_URL+"?wait=true";
     }
     var options = {
       "method": "post",
       "headers": {
         "Content-Type": "application/json",
       },
-        "payload": JSON.stringify(payload) 
+        "payload": JSON.stringify(payload),
+        "muteHttpExceptions": true
     };
     var response = UrlFetchApp.fetch(POST_URL, options);
     return response;
@@ -51,11 +60,13 @@ class Webhook {
  * Construct a new Webhook message.
  * @param {string|boolean} [setUsername=false] - Username to override displayed webhook username for this message. False to use the webhook's username.
  * @param {string|boolean} [avatar_url=false] - Url to avatar to override displayed webhook avatar for this message. False to use the webhook's avatar.
+ * @param {boolean} [getFullResponses=false] Whether the Webhook should wait for the full response when sending webhooks. Required to fetch message IDs of sent messages.
  */
-  constructor(setUsername = false, setAvatar_url = false) {
-    this.content = null;
+  constructor(setUsername = false, setAvatar_url = false, getFullResponses = false) {
     this.username = setUsername;
     this.avatar_url = setAvatar_url;
+    this.fullResponses = getFullResponses;
+    this.content = null;
     this.embeds = [];
   }
 
@@ -106,9 +117,22 @@ class Webhook {
  */
   send(POST_URL, messageID = false, thread_id = false){
     var payload = this.payload();
-    this.response = sendWebhook(POST_URL, payload, messageID, thread_id);
+    this.response = sendWebhook(POST_URL, payload, messageID, thread_id, this.fullResponses);
     return this;
   }
+
+/**
+ * Gets the Message ID of the last message sent by this Webhook.
+ * @returns {string|null} The ID of the last message sent by this Webhook, if the Webhook was constructed with getFullResponses set to true and the Webhook has sent a message. Returns null otherwise.
+ */
+  lastSentMessageID(){
+    if(this.response && this.fullResponses){
+      return JSON.parse(this.response.getContentText()).id;
+    } else {
+      return null;
+    }
+  }
+
 
 }
 
